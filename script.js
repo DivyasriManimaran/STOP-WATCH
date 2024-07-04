@@ -1,50 +1,36 @@
-const api = {
-    key: "fcc8de7015bbb202209bbf0261babf4c",
-    base: "https://api.openweathermap.org/data/2.5/"
-  }
-  
-  const searchbox = document.querySelector('.search-box');
-  searchbox.addEventListener('keypress', setQuery);
-  
-  function setQuery(evt) {
-    if (evt.keyCode == 13) {
-      getResults(searchbox.value);
-    }
-  }
-  
-  function getResults (query) {
-    fetch(${api.base}weather?q=${query}&units=metric&APPID=${api.key})
-      .then(weather => {
-        return weather.json();
-      }).then(displayResults);
-  }
-  
-  function displayResults (weather) {
-    let city = document.querySelector('.location .city');
-    city.innerText = ${weather.name}, ${weather.sys.country};
-  
-    let now = new Date();
-    let date = document.querySelector('.location .date');
-    date.innerText = dateBuilder(now);
-  
-    let temp = document.querySelector('.current .temp');
-    temp.innerHTML = ${Math.round(weather.main.temp)}<span>°c</span>;
-  
-    let weather_el = document.querySelector('.current .weather');
-    weather_el.innerText = weather.weather[0].main;
-  
-    let hilow = document.querySelector('.hi-low');
-    hilow.innerText = ${Math.round(weather.main.temp_min)}°c / ${Math.round(weather.main.temp_max)}°c;
-  }
-  
-  function dateBuilder (d) {
-    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  
-    let day = days[d.getDay()];
-    let date = d.getDate();
-    let month = months[d.getMonth()];
-    let year = d.getFullYear();
-  
-    return ${day} ${date} ${month} ${year};
-  }
+const watch = document.querySelector('#watch');
+let milliseconds = 0;
+let timer;
+
+function startWatch() {
+    watch.classList.remove('paused');
+    clearInterval(timer);
+    timer = setInterval(() => {
+        milliseconds += 10;
+        let dateTimer = new Date(milliseconds);
+        watch.innerHTML =
+            ('0' + dateTimer.getUTCHours()).slice(-2) + ':' +
+            ('0' + dateTimer.getUTCMinutes()).slice(-2) + ':' +
+            ('0' + dateTimer.getUTCSeconds()).slice(-2) + ':' +
+            ('0' + dateTimer.getUTCMilliseconds()).slice(-3, -1);
+    }, 10);
+};
+
+function pauseWatch() {
+    watch.classList.add('paused');
+    clearInterval(timer);
+};
+
+function resetWatch() {
+    watch.classList.remove('paused');
+    clearInterval(timer);
+    milliseconds = 0;
+    watch.innerHTML = '00:00:00:00';
+};
+
+document.addEventListener('click', (e) => {
+    const el = e.target;
+    if (el.id === 'start') startWatch();
+    if (el.id === 'pause') pauseWatch();
+    if (el.id === 'reset') resetWatch();
+});
